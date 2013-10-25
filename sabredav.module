@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * Implements hook_permission
+ * @return array
+ */
+function sabredav_permission() {
+  return array(
+    'sabredav' => array(
+      'title' => 'Access public files via WebDAV',
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu
+ * @return array
+ */
+function sabredav_menu() {
+  return array(
+    'dav' => array(
+      'page callback' => 'sabredav_server',
+      'access callback' => TRUE,
+    ),
+  );
+}
+
+/**
+ * Creates the WebDAV serer at /dav and serves out the public files directory.
+ */
+function sabredav_server() {
+  require_once DRUPAL_ROOT . '/sites/all/libraries/SabreDAV/vendor/autoload.php';
+  require_once __DIR__ . '/sabredav_auth.php';
+
+  $tempPath = variable_get('file_temporary_path', session_save_path()) . '/sabredav';
+  $publicPath = variable_get('file_public_path', conf_path() . '/files');
+
+  $rootDirectory = new \Sabre\DAV\FS\Directory(DRUPAL_ROOT . '/' . $publicPath);
+  $server = new \Sabre\DAV\Server($rootDirectory);
+  $server->setBaseUri(base_path() . 'dav/');
+
+  $lockBackend = new \Sabre\DAV\Locks\Backend\PDO(Database::getConnection());
+  $server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
+  $server->addPlugin(new \Sabre\DAV\Browser\Plugin());
+  $server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());
+  $server->addPlugin(new \Sabre\DAV\TemporaryFileFilterPlugin($tempPath));
+
+  if (!user_access('sabredav')) {
+    $server->addPlugin(new \Sabre\DAV\Auth\Plugin(new Sabre_DAV_Auth_Backend_Drupal(), variable_get('site_name')));
+  }
+
+  $server->exec();
+}
+

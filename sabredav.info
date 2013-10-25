@@ -1,0 +1,6 @@
+name = SabreDAV
+description = Adds WebDAV support via the SabreDAV library.
+core = 7.x
+version = "7.x-1.x"
+
+files[] = sabredav.module

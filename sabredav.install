@@ -1,0 +1,43 @@
+<?php
+
+function sabredav_schema()
+{
+  return array(
+    'sabredav_locks' => array(
+      'description' => 'Stores locks held by WebDAV clients.',
+      'fields' => array(
+        'id' => array(
+          'type'     => 'serial',
+          'unsigned' => TRUE,
+        ),
+        'owner' => array(
+          'type'   => 'varchar',
+          'length' => 100,
+        ),
+        'timeout' => array(
+          'type'     => 'int',
+          'unsigned' => TRUE,
+        ),
+        'created' => array(
+          'type' => 'int',
+        ),
+        'token' => array(
+          'type'   => 'varchar',
+          'length' => 100,
+        ),
+        'scope' => array(
+          'type' => 'int',
+          'size' => 'tiny',
+        ),
+        'depth' => array(
+          'type' => 'int',
+          'size' => 'tiny',
+        ),
+        'depth' => array(
+          'type' => 'text',
+        ),
+      ),
+      'primary key' => array('id'),
+    )
+  );
+}

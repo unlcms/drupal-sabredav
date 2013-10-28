@@ -11,7 +11,17 @@ require_once DRUPAL_ROOT . '/sites/all/libraries/SabreDAV/vendor/autoload.php';
 class Sabre_DAV_Auth_Backend_Drupal extends \Sabre\DAV\Auth\Backend\AbstractBasic
 {
   public function validateUserPass($username, $password) {
-    $account = user_load_by_name($username);
-    return $account && user_access('sabredav', $account) && user_authenticate($username, $password);
+
+    $form = drupal_get_form('user_login');
+    $form_state = form_state_defaults();
+    $form_state['values']['name'] = $username;
+    $form_state['values']['pass'] = $password;
+    form_execute_handlers('validate', $form, $form_state);
+    if (!isset($form_state['uid'])) {
+      return FALSE;
+    }
+
+    $account = user_load($form_state['uid']);
+    return $account && user_access('sabredav', $account);
   }
 }

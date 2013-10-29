@@ -39,8 +39,20 @@ function sabredav_server() {
   $server = new \Sabre\DAV\Server($rootDirectory);
   $server->setBaseUri(base_path() . 'dav/');
 
-  $pdo = Database::getConnection();
-  $table = $pdo->tablePrefix('sabredav_locks') . 'sabredav_locks';
+  $dbInfo = Database::getConnectionInfo();
+  // Drupal's extended PDO object does not play nice with SbareDAV's PDO Lock class,
+  // so we build a vanilla PDO object from scratch.
+  $dbInfo = $dbInfo['default'];
+  if ($dbInfo['driver'] == 'mysql') {
+    $pdo = new PDO('mysql:host=' . $dbInfo['host'] . ';dbname=' . $dbInfo['database'], $dbInfo['username'], $dbInfo['password']);
+  }
+  else if ($dbInfo['driver'] == 'pgsql') {
+    $pdo = new PDO('pgsql:host=' . $dbInfo['host'] . ' dbname=' . $dbInfo['database'] . ' port=' . $dbInfo['port'], $dbInfo['username'], $dbInfo['password']);
+  }
+  else if ($dbInfo['driver'] == 'sqlite') {
+    $pdo = new PDO('sqlite:' . $dbInfo['database'], '', '');
+  }
+  $table = Database::getConnection()->tablePrefix('sabredav_locks') . 'sabredav_locks';
   $lockBackend = new \Sabre\DAV\Locks\Backend\PDO($pdo, $table);
 
   $server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));

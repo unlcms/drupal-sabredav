@@ -33,11 +33,16 @@ function sabredav_schema()
           'type' => 'int',
           'size' => 'tiny',
         ),
-        'depth' => array(
-          'type' => 'text',
+        'uri' => array(
+          'type'   => 'varchar',
+          'length' => 100,
         ),
       ),
       'primary key' => array('id'),
+      'indexes'     => array(
+        'token' => array('token'),
+        'uri'   => array('uri'),
+      ),
     )
   );
 }

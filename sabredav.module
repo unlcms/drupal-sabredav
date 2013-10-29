@@ -39,7 +39,10 @@ function sabredav_server() {
   $server = new \Sabre\DAV\Server($rootDirectory);
   $server->setBaseUri(base_path() . 'dav/');
 
-  $lockBackend = new \Sabre\DAV\Locks\Backend\PDO(Database::getConnection());
+  $pdo = Database::getConnection();
+  $table = $pdo->tablePrefix('sabredav_locks') . 'sabredav_locks';
+  $lockBackend = new \Sabre\DAV\Locks\Backend\PDO($pdo, $table);
+
   $server->addPlugin(new \Sabre\DAV\Locks\Plugin($lockBackend));
   $server->addPlugin(new \Sabre\DAV\Browser\Plugin());
   $server->addPlugin(new \Sabre\DAV\Browser\GuessContentType());

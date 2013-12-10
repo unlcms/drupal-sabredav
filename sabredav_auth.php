@@ -1,6 +1,6 @@
 <?php
 
-require_once DRUPAL_ROOT . '/sites/all/libraries/SabreDAV/vendor/autoload.php';
+require_once __DIR__ . '/SabreDAV/vendor/autoload.php';
 
 /**
  * Class Sabre_DAV_Auth_Backend_Drupal

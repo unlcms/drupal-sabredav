@@ -29,7 +29,7 @@ function sabredav_menu() {
  * Creates the WebDAV serer at /dav and serves out the public files directory.
  */
 function sabredav_server() {
-  require_once DRUPAL_ROOT . '/sites/all/libraries/SabreDAV/vendor/autoload.php';
+  require_once __DIR__ . '/SabreDAV/vendor/autoload.php';
   require_once __DIR__ . '/sabredav_auth.php';
 
   $tempPath = variable_get('file_temporary_path', session_save_path()) . '/sabredav';
